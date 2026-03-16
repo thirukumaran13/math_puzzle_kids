@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Puzzle Fun! 🎉</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23667eea'/><text y='72' x='50' text-anchor='middle' font-size='62'>🔢</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            font-family: 'Nunito', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Twinkling stars */
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+            opacity: 0.6;
+        }
+        @keyframes twinkle {
+            from { opacity: 0.15; transform: scale(1); }
+            to   { opacity: 0.9;  transform: scale(1.8); }
+        }
+
+        /* Main wrapper */
+        .container { position: relative; z-index: 1; width: 100%; max-width: 580px; }
+
+        /* --- Title --- */
+        .title {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.8rem;
+            color: white;
+            text-align: center;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            animation: floatTitle 2s ease-in-out infinite alternate;
+            margin-bottom: 16px;
+        }
+        @keyframes floatTitle {
+            from { transform: translateY(0);   }
+            to   { transform: translateY(-6px);}
+        }
+
+        /* --- Stats row --- */
+        .stats { display: flex; justify-content: center; gap: 14px; margin-bottom: 14px; }
+        .stat-card {
+            background: rgba(255,255,255,0.22);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255,255,255,0.38);
+            border-radius: 18px;
+            padding: 8px 20px;
+            text-align: center;
+            min-width: 90px;
+        }
+        .stat-label { color: rgba(255,255,255,0.88); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { color: white; font-size: 1.9rem; font-weight: 900; line-height: 1.1; }
+
+        /* --- Progress bar --- */
+        .progress-section { margin-bottom: 14px; }
+        .progress-label { color: rgba(255,255,255,0.9); font-size: 0.82rem; font-weight: 700; text-align: center; margin-bottom: 5px; }
+        .progress-bar { height: 10px; background: rgba(255,255,255,0.28); border-radius: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4ade80, #22d3ee); border-radius: 10px; transition: width 0.55s ease; }
+
+        /* --- Puzzle card --- */
+        .puzzle-card {
+            background: white;
+            border-radius: 28px;
+            padding: 34px 26px 28px;
+            text-align: center;
+            box-shadow: 0 22px 60px rgba(0,0,0,0.28);
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .puzzle-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 7px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #4ade80);
+        }
+        .mascot {
+            font-size: 2.8rem;
+            display: inline-block;
+            animation: wiggle 2.4s ease-in-out infinite;
+            margin-bottom: 6px;
+        }
+        @keyframes wiggle {
+            0%,100% { transform: rotate(0deg);   }
+            20%      { transform: rotate(-12deg); }
+            40%      { transform: rotate(12deg);  }
+            60%      { transform: rotate(-8deg);  }
+            80%      { transform: rotate(8deg);   }
+        }
+        .question-label {
+            font-size: 0.88rem; color: #9ca3af; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+        }
+        .equation {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3.8rem; font-weight: 900;
+            color: #1e293b; line-height: 1.3;
+            margin: 10px 0 8px;
+        }
+        .blank {
+            display: inline-flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border-radius: 14px;
+            padding: 2px 22px; min-width: 80px;
+            animation: blinkBorder 1.4s ease-in-out infinite;
+        }
+        @keyframes blinkBorder {
+            0%,100% { box-shadow: 0 0 0 0 rgba(102,126,234,0.5); }
+            50%      { box-shadow: 0 0 0 8px rgba(102,126,234,0);  }
+        }
+
+        /* --- Choice buttons --- */
+        .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+        .choice-btn {
+            padding: 22px 10px;
+            border: none; border-radius: 20px;
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.4rem;
+            cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.18);
+            color: white; position: relative; overflow: hidden;
+        }
+        .choice-btn:hover:not(:disabled)  { transform: translateY(-4px); box-shadow: 0 10px 0 rgba(0,0,0,0.18); }
+        .choice-btn:active:not(:disabled) { transform: translateY(3px);  box-shadow: 0 2px  0 rgba(0,0,0,0.18); }
+        .choice-btn:disabled { cursor: not-allowed; }
+
+        /* Per-button colours set via JS (index) — defined here for reference */
+        .choice-btn.correct {
+            background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+            animation: correctBounce 0.55s ease;
+        }
+        .choice-btn.wrong {
+            background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+            animation: wrongShake 0.45s ease;
+            opacity: 0.68;
+        }
+        @keyframes correctBounce {
+            0%,100% { transform: scale(1); }
+            30%      { transform: scale(1.22) rotate(-5deg); }
+            70%      { transform: scale(1.22) rotate(5deg);  }
+        }
+        @keyframes wrongShake {
+            0%,100% { transform: translateX(0);   }
+            25%      { transform: translateX(-12px); }
+            75%      { transform: translateX(12px);  }
+        }
+
+        /* --- Feedback message --- */
+        .feedback { text-align: center; min-height: 52px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .feedback-msg {
+            font-size: 1.3rem; font-weight: 900;
+            border-radius: 14px; padding: 10px 24px;
+            opacity: 0; transform: scale(0.75);
+            transition: opacity 0.28s, transform 0.28s;
+        }
+        .feedback-msg.show { opacity: 1; transform: scale(1); }
+        .feedback-msg.correct { background: #d1fae5; color: #065f46; }
+        .feedback-msg.wrong   { background: #fee2e2; color: #7f1d1d; }
+
+        /* --- Next button --- */
+        .next-btn {
+            display: block; width: 100%;
+            padding: 17px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border: none; border-radius: 20px;
+            font-family: 'Bubblegum Sans', cursive; font-size: 1.45rem;
+            cursor: pointer; transition: transform 0.18s, box-shadow 0.18s, opacity 0.28s;
+            box-shadow: 0 6px 0 rgba(100,80,200,0.45);
+            opacity: 0; pointer-events: none;
+        }
+        .next-btn.show { opacity: 1; pointer-events: all; }
+        .next-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 0 rgba(100,80,200,0.45); }
+
+        /* --- Confetti --- */
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 200; overflow: hidden; }
+        .confetti-piece {
+            position: absolute; top: -24px;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            to { transform: translateY(105vh) rotate(900deg); opacity: 0; }
+        }
+
+        /* --- Timer --- */
+        .timer-section { display: none; margin-bottom: 12px; }
+        .timer-section.visible { display: block; }
+        .q-counter { text-align: center; color: rgba(255,255,255,0.9); font-size: 0.86rem; font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .timer-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 7px; }
+        .timer-display {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 2.5rem; color: white;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            min-width: 80px; text-align: center; transition: color 0.3s;
+        }
+        .timer-display.urgent { color: #ff6b6b; animation: timerPulse 0.5s ease-in-out infinite alternate; }
+        @keyframes timerPulse {
+            from { transform: scale(1); }
+            to   { transform: scale(1.22); }
+        }
+        .timer-bar { height: 13px; background: rgba(255,255,255,0.25); border-radius: 10px; overflow: hidden; }
+        .timer-fill {
+            height: 100%; width: 100%;
+            background: linear-gradient(90deg, #4ade80, #22d3ee);
+            border-radius: 10px;
+            transition: width 1s linear, background 0.6s;
+        }
+        .timer-fill.half   { background: linear-gradient(90deg, #fbbf24, #f97316); }
+        .timer-fill.urgent { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+        /* --- Game Over overlay --- */
+        .game-over-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.68); backdrop-filter: blur(7px);
+            z-index: 300; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.38s;
+        }
+        .game-over-overlay.show { opacity: 1; pointer-events: all; }
+        .game-over-card {
+            background: white; border-radius: 32px;
+            padding: 38px 34px 32px; text-align: center;
+            max-width: 390px; width: 92%;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.42);
+            transform: scale(0.78); transition: transform 0.38s cubic-bezier(.34,1.56,.64,1);
+            position: relative; overflow: hidden;
+        }
+        .game-over-overlay.show .game-over-card { transform: scale(1); }
+        .game-over-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #4ade80);
+        }
+        .go-emoji  { font-size: 4.5rem; display: block; margin-bottom: 8px; animation: wiggle 2.4s ease-in-out infinite; }
+        .go-title  { font-family: 'Bubblegum Sans', cursive; font-size: 2.4rem; color: #1e293b; margin-bottom: 4px; }
+        .go-sub    { color: #6b7280; font-size: 0.98rem; font-weight: 700; margin-bottom: 22px; }
+        .go-stats  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .go-stat   { background: #f8fafc; border-radius: 16px; padding: 14px 8px; }
+        .go-stat-label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; margin-bottom: 2px; }
+        .go-stat-val   { font-family: 'Bubblegum Sans', cursive; font-size: 2.1rem; color: #1e293b; }
+        .go-play-again {
+            display: block; width: 100%; padding: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; border: none; border-radius: 20px;
+            font-family: 'Bubblegum Sans', cursive; font-size: 1.45rem;
+            cursor: pointer; transition: transform 0.18s, box-shadow 0.18s;
+            box-shadow: 0 6px 0 rgba(100,80,200,0.45);
+        }
+        .go-play-again:hover { transform: translateY(-3px); box-shadow: 0 10px 0 rgba(100,80,200,0.45); }
+
+        /* --- Settings drawer (fixed right side) --- */
+        .settings-fab {
+            position: fixed; top: 50%; right: 0;
+            transform: translateY(-50%);
+            z-index: 400;
+            background: white;
+            border: none; border-radius: 14px 0 0 14px;
+            padding: 14px 10px;
+            cursor: pointer;
+            box-shadow: -4px 0 18px rgba(0,0,0,0.22);
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            transition: background 0.2s, padding 0.2s;
+        }
+        .settings-fab:hover  { background: #f0f0ff; padding-right: 14px; }
+        .settings-fab.open   { background: #667eea; }
+        .settings-fab .fab-icon { font-size: 1.4rem; }
+        .settings-fab .fab-label {
+            font-family: 'Nunito', sans-serif; font-weight: 800;
+            font-size: 0.58rem; letter-spacing: 1px; text-transform: uppercase;
+            color: #667eea; writing-mode: vertical-rl; text-orientation: mixed;
+        }
+        .settings-fab.open .fab-label { color: white; }
+
+        /* --- Mute button (top-right) --- */
+        .mute-btn {
+            position: fixed; top: 14px; right: 14px; z-index: 300;
+            background: rgba(255,255,255,0.22);
+            backdrop-filter: blur(6px);
+            border: 2px solid rgba(255,255,255,0.45);
+            border-radius: 50%;
+            width: 46px; height: 46px;
+            font-size: 1.3rem; line-height: 1;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+        }
+        .mute-btn:hover { background: rgba(255,255,255,0.38); transform: scale(1.1); }
+        .mute-btn.muted { background: rgba(0,0,0,0.25); }
+
+        /* Overlay behind the drawer on small screens */
+        .settings-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+            z-index: 390; opacity: 0; pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .settings-backdrop.show { opacity: 1; pointer-events: all; }
+
+        /* Drawer panel */
+        .settings-drawer {
+            position: fixed; top: 0; right: -340px; width: 320px; height: 100%;
+            z-index: 395;
+            background: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
+            box-shadow: -6px 0 30px rgba(0,0,0,0.3);
+            overflow-y: auto; padding: 24px 20px 32px;
+            transition: right 0.35s cubic-bezier(.4,0,.2,1);
+            display: flex; flex-direction: column; gap: 0;
+        }
+        .settings-drawer.open { right: 0; }
+        .drawer-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .drawer-title {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 1.5rem; color: white;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+        }
+        .drawer-close {
+            background: rgba(255,255,255,0.22); border: none; border-radius: 50%;
+            width: 34px; height: 34px; font-size: 1.1rem; color: white;
+            cursor: pointer; transition: background 0.18s; line-height: 34px; text-align: center;
+        }
+        .drawer-close:hover { background: rgba(255,255,255,0.38); }
+        .cfg-group { margin-bottom: 20px; }
+        .cfg-group:last-child { margin-bottom: 0; }
+        .cfg-label { color: rgba(255,255,255,0.92); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 8px; }
+        .cfg-btns  { display: flex; gap: 8px; flex-wrap: wrap; }
+        .cfg-btn {
+            padding: 7px 15px;
+            border: 2px solid rgba(255,255,255,0.4); border-radius: 18px;
+            background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+            font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .cfg-btn:hover:not(:disabled) { background: rgba(255,255,255,0.25); }
+        .cfg-btn.active { background: white; color: #667eea; border-color: white; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+        .cfg-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .cfg-note { color: rgba(255,255,255,0.75); font-size: 0.74rem; font-weight: 700; margin-top: 6px; font-style: italic; min-height: 18px; }
+        .cfg-divider { border: none; border-top: 1px solid rgba(255,255,255,0.2); margin: 16px 0; }
+    </style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="confetti-container" id="confetti"></div>
+
+<!-- Mute button (top-right) -->
+<button class="mute-btn" id="mute-btn" onclick="toggleSound()" title="Toggle sound">🔊</button>
+
+<!-- Settings FAB (fixed right edge) -->
+<button class="settings-fab" id="settings-fab" onclick="toggleSettings()" aria-label="Settings">
+    <span class="fab-icon">⚙️</span>
+    <span class="fab-label">Settings</span>
+</button>
+
+<!-- Settings backdrop -->
+<div class="settings-backdrop" id="settings-backdrop" onclick="toggleSettings()"></div>
+
+<!-- Settings drawer -->
+<div class="settings-drawer" id="settings-drawer">
+    <div class="drawer-header">
+        <div class="drawer-title">⚙️ Settings</div>
+        <button class="drawer-close" onclick="toggleSettings()">✕</button>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="cfg-group">
+        <div class="cfg-label">🎮 Game Mode</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn"        id="mode-free"  onclick="setMode('free')">🎮 Free Play</button>
+            <button class="cfg-btn active"  id="mode-timed" onclick="setMode('timed')">⏱️ Timed Mode</button>
+        </div>
+    </div>
+
+    <hr class="cfg-divider">
+
+    <!-- Difficulty -->
+    <div class="cfg-group">
+        <div class="cfg-label">🌟 Difficulty</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn diff-easy"          id="diff-btn-easy"   onclick="setDifficulty('easy')">🌱 Easy</button>
+            <button class="cfg-btn diff-medium active"  id="diff-btn-medium" onclick="setDifficulty('medium')">🌟 Medium</button>
+            <button class="cfg-btn diff-hard"           id="diff-btn-hard"   onclick="setDifficulty('hard')">🔥 Hard</button>
+        </div>
+    </div>
+
+    <hr class="cfg-divider">
+
+    <!-- Number size -->
+    <div class="cfg-group">
+        <div class="cfg-label">🔢 Number Size</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn"        id="cfg-digits-1" onclick="setCfgDigits(1)">1 digit &nbsp;(≤ 9)</button>
+            <button class="cfg-btn active" id="cfg-digits-2" onclick="setCfgDigits(2)">2 digits (≤ 99)</button>
+            <button class="cfg-btn"        id="cfg-digits-3" onclick="setCfgDigits(3)">3 digits (≤ 999)</button>
+            <button class="cfg-btn"        id="cfg-digits-4" onclick="setCfgDigits(4)">4 digits (≤ 9999)</button>
+        </div>
+    </div>
+
+    <hr class="cfg-divider">
+
+    <!-- Number of terms -->
+    <div class="cfg-group">
+        <div class="cfg-label">➕ Number of Terms</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn active" id="cfg-factors-2" onclick="setCfgFactors(2)">2 terms &nbsp;( a ± b )</button>
+            <button class="cfg-btn"        id="cfg-factors-3" onclick="setCfgFactors(3)">3 terms &nbsp;( a ± b ± c )</button>
+            <button class="cfg-btn"        id="cfg-factors-4" onclick="setCfgFactors(4)">4 terms &nbsp;( a ± b ± c ± d )</button>
+        </div>
+        <div class="cfg-note">Higher terms include fewer-term questions too</div>
+    </div>
+
+    <hr class="cfg-divider">
+
+    <!-- Extra operations -->
+    <div class="cfg-group">
+        <div class="cfg-label">✖️ Extra Operations</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn" id="cfg-mul" onclick="toggleCfgOp('mul')">✖️ Multiply</button>
+            <button class="cfg-btn" id="cfg-div" onclick="toggleCfgOp('div')">➗ Divide</button>
+        </div>
+        <div class="cfg-note" id="cfg-ops-note">ℹ️ Applied when a 2-term question is generated</div>
+    </div>
+
+    <hr class="cfg-divider">
+
+    <!-- Sound toggle -->
+    <div class="cfg-group">
+        <div class="cfg-label">🔊 Sound</div>
+        <div class="cfg-btns">
+            <button class="cfg-btn active" id="cfg-sound" onclick="toggleSound()">🔊 Sound On</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="title">🔢 Math Puzzle Fun! 🎉</div>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">⭐ Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🔥 Streak</div>
+            <div class="stat-value" id="streak">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">📝 Done</div>
+            <div class="stat-value" id="total">0</div>
+        </div>
+    </div>
+
+    <!-- Timer (timed mode only) -->
+    <div class="timer-section" id="timer-section">
+        <div class="q-counter" id="q-counter">Question 1 of 10</div>
+        <div class="timer-row">
+            <div class="timer-display" id="timer-display">⏱️ 15</div>
+        </div>
+        <div class="timer-bar"><div class="timer-fill" id="timer-fill"></div></div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-section">
+        <div class="progress-label" id="progress-label">Let's go! 🚀</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <!-- Puzzle card -->
+    <div class="puzzle-card">
+        <div class="mascot" id="mascot">🦉</div>
+        <div class="question-label">Find the missing number 🔍</div>
+        <div class="equation" id="equation"></div>
+    </div>
+
+    <!-- Answer choices -->
+    <div class="choices" id="choices"></div>
+
+    <!-- Feedback -->
+    <div class="feedback">
+        <div class="feedback-msg" id="feedback"></div>
+    </div>
+
+    <!-- Next -->
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question ➡️</button>
+
+</div>
+
+<!-- Game Over modal -->
+<div class="game-over-overlay" id="game-over-overlay">
+    <div class="game-over-card">
+        <span class="go-emoji" id="go-emoji">🏆</span>
+        <div class="go-title" id="go-title">Time's Up!</div>
+        <div class="go-sub"   id="go-sub">Here's how you did:</div>
+        <div class="go-stats">
+            <div class="go-stat"><div class="go-stat-label">⭐ Score</div>    <div class="go-stat-val" id="go-score">0</div></div>
+            <div class="go-stat"><div class="go-stat-label">✅ Correct</div>  <div class="go-stat-val" id="go-correct">0/10</div></div>
+            <div class="go-stat"><div class="go-stat-label">📊 Accuracy</div> <div class="go-stat-val" id="go-acc">0%</div></div>
+            <div class="go-stat"><div class="go-stat-label">🔥 Best Streak</div><div class="go-stat-val" id="go-best">0</div></div>
+        </div>
+        <button class="go-play-again" onclick="restartTimedGame()">🔄 Play Again!</button>
+    </div>
+</div>
+
+<script>
+    /* ── state ────────────────────────────────────────────────── */
+    let score = 0, streak = 0, totalQ = 0, correctQ = 0;
+    let currentAnswer = 0, answered = false;
+    let difficulty = 'medium';
+
+    /* ── timed mode state ─────────────────────────────────────── */
+    let timedMode    = true;
+    let timerInterval = null;
+    let timeLeft     = 15;
+    let timedQCount  = 0;   // questions served in current timed game
+    let bestStreak   = 0;
+    const TOTAL_TIMED_Q = 10;
+    const TIME_LIMITS   = { easy: 20, medium: 15, hard: 10 };
+    // Dynamic limit = base + bonus for extra digits + bonus for extra terms
+    function getTimeLimit() {
+        const base       = TIME_LIMITS[difficulty];          // 15 / 10 / 7
+        const digitBonus = (maxDigits  - 1) * 5;            // +5s per extra digit tier
+        const termBonus  = (maxFactors - 2) * 5;            // +5s per extra term tier
+        return base + digitBonus + termBonus;
+    }
+
+    /* free-play auto-advance */
+    let freePlayTimer    = null;
+    let freePlayCountdown = 0;
+    let freePlayTickInterval = null;
+    const FREE_PLAY_DELAY = 2; // seconds before auto-advance
+
+    /* ── sound engine (Web Audio API — no external deps) ───────── */
+    let audioCtx = null;
+    let soundOn  = true;
+
+    function getAudioCtx() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return audioCtx;
+    }
+
+    function playTone(freqs, durations, type, vol) {
+        if (!soundOn) return;
+        type = type || 'sine'; vol = vol || 0.22;
+        const ctx = getAudioCtx();
+        let t = ctx.currentTime;
+        freqs.forEach(function(f, i) {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.value = f;
+            gain.gain.setValueAtTime(vol, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + durations[i]);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(t); osc.stop(t + durations[i]);
+            t += durations[i];
+        });
+    }
+
+    function sfxCorrect()  { playTone([523,659,784,1047],    [0.11,0.11,0.11,0.22], 'sine',     0.20); }
+    function sfxStreak()   { playTone([523,659,784,880,1047],[0.09,0.09,0.09,0.09,0.28],'triangle',0.26); }
+    function sfxWrong()    { playTone([330,220],             [0.18,0.32], 'sawtooth', 0.16); }
+    function sfxTimeout()  { playTone([440,370,294],         [0.14,0.14,0.34],'triangle',0.20); }
+    function sfxTick()     { playTone([880],                 [0.05], 'square',   0.07); }
+
+    /* Chord helper: all freqs play simultaneously at startTime */
+    function playChordAt(ctx, freqs, startTime, duration, type, vol) {
+        freqs.forEach(function(f) {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.value = f;
+            gain.gain.setValueAtTime(vol || 0.12, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(startTime); osc.stop(startTime + duration);
+        });
+    }
+
+    /* Summary sounds — played when Game Over card appears */
+    function sfxSummaryWin() {
+        // Triumphant fanfare: chord progression I-IV-V-I with rising melody
+        if (!soundOn) return;
+        const ctx = getAudioCtx();
+        const t = ctx.currentTime;
+        playChordAt(ctx, [262,330,392],      t,      0.20, 'triangle', 0.10);
+        playChordAt(ctx, [349,440,523],      t+0.22, 0.20, 'triangle', 0.10);
+        playChordAt(ctx, [392,494,587],      t+0.44, 0.20, 'triangle', 0.10);
+        playChordAt(ctx, [523,659,784,1047], t+0.68, 0.65, 'triangle', 0.12);
+        playTone([523,659,784,880,1047,1319],[0.18,0.10,0.10,0.10,0.14,0.65],'sine',0.18);
+    }
+
+    function sfxSummaryGood() {
+        // Warm 2-chord lift: pleasant but not over-the-top
+        if (!soundOn) return;
+        const ctx = getAudioCtx();
+        const t = ctx.currentTime;
+        playChordAt(ctx, [392,494,587], t,      0.18, 'sine', 0.10);
+        playChordAt(ctx, [440,554,659], t+0.20, 0.38, 'sine', 0.11);
+        playTone([523,659,784], [0.12,0.12,0.38], 'triangle', 0.18);
+    }
+
+    function sfxSummaryTryAgain() {
+        // Gentle descending resolve — encouraging, not harsh
+        if (!soundOn) return;
+        const ctx = getAudioCtx();
+        const t = ctx.currentTime;
+        playChordAt(ctx, [392,466,523], t,      0.22, 'sine', 0.09);
+        playChordAt(ctx, [330,392,494], t+0.25, 0.42, 'sine', 0.09);
+        playTone([440,392,349,294], [0.14,0.14,0.14,0.42], 'triangle', 0.15);
+    }
+
+    function toggleSound() {
+        soundOn = !soundOn;
+        const drawerBtn = document.getElementById('cfg-sound');
+        const muteBtn   = document.getElementById('mute-btn');
+        drawerBtn.textContent = soundOn ? '🔊 Sound On' : '🔇 Sound Off';
+        drawerBtn.classList.toggle('active', soundOn);
+        muteBtn.textContent = soundOn ? '🔊' : '🔇';
+        muteBtn.classList.toggle('muted', !soundOn);
+    }
+
+    /* ── puzzle configuration ─────────────────────────────────── */
+    let maxDigits  = 2;     // 2 → max 99 | 3 → max 999 | 4 → max 9999
+    let maxFactors = 2;     // number of addends (2, 3, or 4)
+    let inclMul    = false; // include ✖️ multiplication (2-factor only)
+    let inclDiv    = false; // include ➗ division      (2-factor only)
+
+    const MASCOTS = ['🦉','🐻','🦊','🐸','🦄','🐧','🦁','🐨','🐼','🐙','🦋','🐬'];
+    const CORRECT_MSGS = [
+        '🎉 Amazing! You nailed it!',
+        '⭐ Superstar! Correct!',
+        '🌟 Brilliant work!',
+        '🎊 Wow, you\'re so smart!',
+        '🏆 Perfect! Keep going!',
+        '✨ Fantastic answer!',
+        '🚀 You\'re on fire!',
+        '💫 Excellent job!',
+    ];
+    const WRONG_MSGS = [
+        '😅 Oops! Try the next one!',
+        '💪 Keep going — you\'ve got this!',
+        '🌈 Not quite! Keep trying!',
+        '🤔 Almost there — keep learning!',
+    ];
+
+    /* colour palette for the 4 choice buttons */
+    const BTN_COLORS = [
+        { bg: 'linear-gradient(135deg,#ff6b6b,#ee5a24)', color: 'white'  },
+        { bg: 'linear-gradient(135deg,#feca57,#f9ca24)', color: '#333'   },
+        { bg: 'linear-gradient(135deg,#48dbfb,#0abde3)', color: 'white'  },
+        { bg: 'linear-gradient(135deg,#ff9ff3,#f368e0)', color: 'white'  },
+    ];
+
+    /* ── helpers ──────────────────────────────────────────────── */
+    function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function pick(arr)         { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = randInt(0, i);
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    function getMax() {
+        const digitMax = { 1: 9, 2: 99, 3: 999, 4: 9999 }[maxDigits];
+        const scale    = { easy: 0.25, medium: 0.55, hard: 1.0 }[difficulty];
+        return Math.max(9, Math.round(digitMax * scale));
+    }
+
+    /* ── problem generation ───────────────────────────────────── */
+    function generateProblem() {
+        const max = getMax();
+
+        // Random number of terms between 2 and maxFactors
+        const numTerms = maxFactors === 2 ? 2 : randInt(2, maxFactors);
+
+        // For 2-term questions include mul/div if enabled
+        if (numTerms === 2) {
+            const ops2 = ['add', 'sub'];
+            if (inclMul) ops2.push('mul');
+            if (inclDiv) ops2.push('div');
+            const op2 = pick(ops2);
+            if (op2 === 'mul') return generateMul(max);
+            if (op2 === 'div') return generateDiv(max);
+            if (op2 === 'sub') return generateSub(max);
+            return generateAdd(max, 2);
+        }
+
+        // 3+ terms: mixed add/subtraction
+        return generateAddSub(max, numTerms);
+    }
+
+    /* Pure addition with exactly 2 terms (used as a 2-term op option) */
+    function generateAdd(max, numTerms) {
+        const total = randInt(numTerms, max);
+        const terms = [];
+        let remaining = total;
+        for (let i = 0; i < numTerms - 1; i++) {
+            const maxTerm = remaining - (numTerms - 1 - i);
+            const t = randInt(1, Math.max(1, maxTerm));
+            terms.push(t);
+            remaining -= t;
+        }
+        terms.push(remaining);
+
+        const blankPos = randInt(0, numTerms);
+        let answer;
+        const parts = terms.map((t, i) => {
+            if (i === blankPos) { answer = t; return '<span class="blank">?</span>'; }
+            return String(t);
+        });
+
+        let html;
+        if (blankPos === numTerms) {
+            answer = total;
+            html = parts.join(' + ') + ' = <span class="blank">?</span>';
+        } else {
+            html = parts.join(' + ') + ` = ${total}`;
+        }
+        return { html, answer, opLabel: '➕ Addition' };
+    }
+
+    /* Mixed +/− with 2–4 terms */
+    function generateAddSub(max, numTerms) {
+        const termMax = Math.max(2, Math.floor(max / numTerms));
+        let terms, opSyms, result, attempts = 0;
+        do {
+            terms  = Array.from({length: numTerms}, () => randInt(1, termMax));
+            opSyms = Array.from({length: numTerms - 1}, () => Math.random() > 0.5 ? '+' : '-');
+            result = terms[0];
+            for (let i = 1; i < numTerms; i++)
+                result = opSyms[i-1] === '+' ? result + terms[i] : result - terms[i];
+            attempts++;
+        } while (result < 1 && attempts < 80);
+
+        // Fallback: force all '+' if result still non-positive
+        if (result < 1) {
+            opSyms = opSyms.map(() => '+');
+            result = terms.reduce((s, t) => s + t, 0);
+        }
+
+        const blankPos = randInt(0, numTerms);
+        let answer;
+        const parts = terms.map((t, i) => {
+            if (i === blankPos) { answer = t; return '<span class="blank">?</span>'; }
+            return String(t);
+        });
+
+        let expr = parts[0];
+        for (let i = 1; i < numTerms; i++) expr += ` ${opSyms[i-1]} ${parts[i]}`;
+
+        let html;
+        if (blankPos === numTerms) {
+            answer = result;
+            html = expr + ' = <span class="blank">?</span>';
+        } else {
+            html = expr + ` = ${result}`;
+        }
+
+        const usedSet = new Set(opSyms);
+        const opLabel = usedSet.has('+') && usedSet.has('-')
+            ? `➕➖ Mixed (${numTerms} terms)`
+            : usedSet.has('-') ? `➖ Subtraction (${numTerms} terms)`
+            : `➕ Addition (${numTerms} terms)`;
+        return { html, answer, opLabel };
+    }
+
+    /* 2-term subtraction: a - b = c */
+    function generateSub(max) {
+        const a = randInt(2, max);
+        const b = randInt(1, a - 1);
+        const c = a - b;
+        const blank = randInt(0, 2);
+        let html, answer;
+        if (blank === 0) { html = `<span class="blank">?</span> - ${b} = ${c}`; answer = a; }
+        else if (blank === 1) { html = `${a} - <span class="blank">?</span> = ${c}`; answer = b; }
+        else                  { html = `${a} - ${b} = <span class="blank">?</span>`; answer = c; }
+        return { html, answer, opLabel: '➖ Subtraction' };
+    }
+
+    /* Multiplication: a × b = c */
+    function generateMul(max) {
+        const aMax = Math.min(12, max);
+        const a    = randInt(1, aMax);
+        const bMax = Math.min(12, Math.floor(max / a));
+        const b    = randInt(1, Math.max(1, bMax));
+        const c    = a * b;
+        const blank = randInt(0, 2);
+        let html, answer;
+        if (blank === 0) { html = `<span class="blank">?</span> × ${b} = ${c}`; answer = a; }
+        else if (blank === 1) { html = `${a} × <span class="blank">?</span> = ${c}`; answer = b; }
+        else                  { html = `${a} × ${b} = <span class="blank">?</span>`; answer = c; }
+        return { html, answer, opLabel: '✖️ Multiplication' };
+    }
+
+    /* Division: a ÷ b = c  (guarantees whole-number answer) */
+    function generateDiv(max) {
+        const bMax = Math.min(12, max);
+        const b    = randInt(1, bMax);
+        const cMax = Math.min(12, Math.floor(max / b));
+        const c    = randInt(1, Math.max(1, cMax));
+        const a    = b * c;
+        const blank = randInt(0, 2);
+        let html, answer;
+        if (blank === 0) { html = `<span class="blank">?</span> ÷ ${b} = ${c}`; answer = a; }
+        else if (blank === 1) { html = `${a} ÷ <span class="blank">?</span> = ${c}`; answer = b; }
+        else                  { html = `${a} ÷ ${b} = <span class="blank">?</span>`; answer = c; }
+        return { html, answer, opLabel: '➗ Division' };
+    }
+
+    function generateChoices(answer) {
+        const set = new Set([answer]);
+
+        if (difficulty === 'hard') {
+            // ALL distractors must share the EXACT same ones digit as the answer.
+            // They differ only in higher place values, so kids must compute fully.
+            const onesDigit = answer % 10;
+            // Step size: multiples of 10 away from the answer (±10, ±20, ±30 …)
+            // Use a random step between 1–5 tens so choices cluster but differ
+            const usedSteps = new Set([0]);
+            let attempts = 0;
+            while (set.size < 4 && attempts < 400) {
+                const step = randInt(1, Math.max(5, Math.ceil(answer / 10))) * 10
+                           * (Math.random() > 0.5 ? 1 : -1);
+                if (!usedSteps.has(step)) {
+                    const w = answer + step;
+                    if (w > 0 && w % 10 === onesDigit) {
+                        usedSteps.add(step);
+                        set.add(w);
+                    }
+                }
+                attempts++;
+            }
+            // Fallback: nearest multiples of 10 that preserve ones digit
+            for (let mult = 1; set.size < 4; mult++) {
+                const up   = answer + mult * 10;
+                const down = answer - mult * 10;
+                if (!set.has(up)   && up   > 0) set.add(up);
+                if (set.size < 4 && !set.has(down) && down > 0) set.add(down);
+            }
+
+        } else if (difficulty === 'medium') {
+            // Medium: distractors within ~10–15% but at least 2 of them share the ones digit
+            const onesDigit = answer % 10;
+            const spread = Math.max(10, Math.ceil(answer * 0.15));
+            let sameOneCount = 0;
+            let attempts = 0;
+            while (set.size < 4 && attempts < 400) {
+                const delta = randInt(1, spread) * (Math.random() > 0.5 ? 1 : -1);
+                const w = answer + delta;
+                if (w > 0 && !set.has(w)) {
+                    // Ensure at least 2 distractors share the ones digit
+                    if (sameOneCount < 2 && w % 10 !== onesDigit) { attempts++; continue; }
+                    if (w % 10 === onesDigit) sameOneCount++;
+                    set.add(w);
+                }
+                attempts++;
+            }
+            // Fallback
+            for (let d = 1; set.size < 4; d++) {
+                if (!set.has(answer + d)) set.add(answer + d);
+                if (set.size < 4 && answer - d > 0 && !set.has(answer - d)) set.add(answer - d);
+            }
+
+        } else {
+            // Easy: wide spread — different ones digits are fine for young kids
+            const spread = Math.max(3, Math.ceil(answer * 0.25));
+            let attempts = 0;
+            while (set.size < 4 && attempts < 300) {
+                const w = answer + randInt(-spread, spread);
+                if (w !== answer && w > 0) set.add(w);
+                attempts++;
+            }
+            for (let d = 1; set.size < 4; d++) {
+                if (!set.has(answer + d)) set.add(answer + d);
+                if (set.size < 4 && answer - d > 0 && !set.has(answer - d)) set.add(answer - d);
+            }
+        }
+
+        return shuffle([...set]);
+    }
+
+    /* ── UI rendering ─────────────────────────────────────────── */
+    function loadQuestion() {
+        answered = false;
+
+        const { html, answer, opLabel } = generateProblem();
+        currentAnswer = answer;
+
+        const eqEl = document.getElementById('equation');
+        eqEl.innerHTML = html;
+        // Scale equation font to prevent overflow for long equations
+        const textLen = eqEl.textContent.length;
+        eqEl.style.fontSize = textLen > 20 ? '1.8rem' : textLen > 13 ? '2.5rem' : '3.8rem';
+        document.getElementById('mascot').textContent  = pick(MASCOTS);
+
+        /* choices */
+        const choices = generateChoices(answer);
+        const choicesDiv = document.getElementById('choices');
+        choicesDiv.innerHTML = '';
+
+        choices.forEach((val, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.textContent = val;
+            btn.style.background = BTN_COLORS[i].bg;
+            btn.style.color      = BTN_COLORS[i].color;
+            // Scale choice font for larger numbers
+            btn.style.fontSize = val >= 1000 ? '1.5rem' : val >= 100 ? '1.9rem' : '2.4rem';
+            btn.addEventListener('click', () => handleAnswer(btn, val));
+            choicesDiv.appendChild(btn);
+        });
+
+        /* reset feedback & next button */
+        const fb = document.getElementById('feedback');
+        fb.className = 'feedback-msg';
+        fb.textContent = '';
+        document.getElementById('next-btn').className = 'next-btn';
+
+        /* timed mode: update counter and (re)start countdown */
+        if (timedMode) {
+            updateQCounter();
+            startTimer();
+        }
+    }
+
+    function handleAnswer(btn, choice) {
+        if (answered) return;
+        answered = true;
+        totalQ++;
+        if (timedMode) stopTimer();
+
+        document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+
+        const fb = document.getElementById('feedback');
+        const isCorrect = choice === currentAnswer;
+
+        if (isCorrect) {
+            btn.className = 'choice-btn correct';
+            // grey out the other 3 buttons
+            document.querySelectorAll('.choice-btn').forEach(b => {
+                if (b !== btn) {
+                    b.style.background = '#d1d5db';
+                    b.style.color = '#6b7280';
+                    b.style.boxShadow = '0 4px 0 #9ca3af';
+                }
+            });
+            correctQ++;
+            streak++;
+            if (streak > bestStreak) bestStreak = streak;
+            const pts = { easy: 10, medium: 20, hard: 30 }[difficulty];
+            const bonus = streak >= 3 ? Math.floor(streak / 3) * 5 : 0;
+            score += pts + bonus;
+
+            fb.className = 'feedback-msg correct show';
+            fb.textContent = pick(CORRECT_MSGS);
+
+            if (streak >= 3) { launchConfetti(); sfxStreak(); } else { sfxCorrect(); }
+        } else {
+            btn.className = 'choice-btn wrong';
+            streak = 0;
+
+            /* highlight the correct answer; grey out everything else */
+            document.querySelectorAll('.choice-btn').forEach(b => {
+                if (Number(b.textContent.trim()) === currentAnswer) {
+                    b.style.background = 'linear-gradient(135deg,#2ecc71,#27ae60)';
+                    b.style.color = 'white';
+                    b.style.animation = 'correctBounce 0.55s ease';
+                } else if (b !== btn) {
+                    b.style.background = '#d1d5db';
+                    b.style.color = '#6b7280';
+                    b.style.boxShadow = '0 4px 0 #9ca3af';
+                }
+            });
+
+            fb.className = 'feedback-msg wrong show';
+            fb.textContent = pick(WRONG_MSGS);
+            sfxWrong();
+        }
+
+        updateStats();
+
+        if (timedMode) {
+            advanceTimedQuestion();
+        } else {
+            setTimeout(() => { document.getElementById('next-btn').className = 'next-btn show'; }, 520);
+            startFreePlayTimer();
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('score').textContent  = score;
+        document.getElementById('streak').textContent = streak >= 3 ? `${streak} 🔥` : streak;
+        document.getElementById('total').textContent  = totalQ;
+
+        const acc = totalQ > 0 ? Math.round((correctQ / totalQ) * 100) : 0;
+        document.getElementById('progress-fill').style.width = acc + '%';
+
+        const lbl =
+            totalQ === 0 ? 'Let\'s go! 🚀' :
+            acc >= 90    ? `🏆 ${acc}% — Outstanding!` :
+            acc >= 70    ? `⭐ ${acc}% — Great job!`   :
+            acc >= 50    ? `📈 ${acc}% — Keep trying!` :
+                           `💪 ${acc}% — You can do it!`;
+        document.getElementById('progress-label').textContent = lbl;
+    }
+
+    /* ── controls ─────────────────────────────────────────────── */
+    function nextQuestion() {
+        clearFreePlayTimer();
+        loadQuestion();
+    }
+
+    /* ── free-play auto-advance ───────────────────────────────── */
+    function startFreePlayTimer() {
+        clearFreePlayTimer();
+        freePlayCountdown = FREE_PLAY_DELAY;
+        updateNextBtnLabel();
+        freePlayTickInterval = setInterval(() => {
+            freePlayCountdown--;
+            updateNextBtnLabel();
+            if (freePlayCountdown <= 0) { clearFreePlayTimer(); loadQuestion(); }
+        }, 1000);
+    }
+
+    function clearFreePlayTimer() {
+        if (freePlayTimer)       { clearTimeout(freePlayTimer);   freePlayTimer = null; }
+        if (freePlayTickInterval){ clearInterval(freePlayTickInterval); freePlayTickInterval = null; }
+        // reset label
+        const btn = document.getElementById('next-btn');
+        if (btn) btn.textContent = 'Next Question ➡️';
+    }
+
+    function updateNextBtnLabel() {
+        const btn = document.getElementById('next-btn');
+        if (btn) btn.textContent = freePlayCountdown > 0
+            ? `Next in ${freePlayCountdown}s ⏳`
+            : 'Next Question ➡️';
+    }
+
+    function setDifficulty(d) {
+        difficulty = d;
+        ['easy','medium','hard'].forEach(v => {
+            document.getElementById(`diff-btn-${v}`).classList.toggle('active', v === d);
+        });
+        if (timedMode) { resetTimedState(); }
+        loadQuestion();
+    }
+
+    function setMode(m) {
+        timedMode = (m === 'timed');
+        document.getElementById('mode-free').classList.toggle('active',  !timedMode);
+        document.getElementById('mode-timed').classList.toggle('active',  timedMode);
+        document.getElementById('timer-section').classList.toggle('visible', timedMode);
+        stopTimer();
+        resetTimedState();
+        score = 0; streak = 0; totalQ = 0; correctQ = 0;
+        updateStats();
+        loadQuestion();
+    }
+
+    /* ── timed mode helpers ───────────────────────────────────── */
+    function resetTimedState() { timedQCount = 0; bestStreak = 0; }
+
+    function startTimer() {
+        stopTimer();
+        timeLeft = getTimeLimit();
+        updateTimerUI();
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerUI();
+            if (timeLeft <= 0) { clearInterval(timerInterval); timerInterval = null; onTimerExpire(); }
+        }, 1000);
+    }
+
+    function stopTimer() {
+        if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function updateTimerUI() {
+        const total = getTimeLimit();
+        const pct   = (timeLeft / total) * 100;
+        const td = document.getElementById('timer-display');
+        const tf = document.getElementById('timer-fill');
+        td.textContent = `⏱️ ${timeLeft}`;
+        tf.style.width = pct + '%';
+        if (pct > 50)       { td.classList.remove('urgent'); tf.className = 'timer-fill'; }
+        else if (pct > 25)  { td.classList.remove('urgent'); tf.className = 'timer-fill half'; }
+        else                { td.classList.add('urgent');    tf.className = 'timer-fill urgent'; sfxTick(); }
+    }
+
+    function onTimerExpire() {
+        if (answered) return;
+        answered = true;
+        totalQ++;
+        streak = 0;
+        document.querySelectorAll('.choice-btn').forEach(b => {
+            b.disabled = true;
+            if (Number(b.textContent.trim()) === currentAnswer) {
+                b.style.background = 'linear-gradient(135deg,#2ecc71,#27ae60)';
+                b.style.color = 'white';
+            } else {
+                b.style.background = '#d1d5db';
+                b.style.color = '#6b7280';
+                b.style.boxShadow = '0 4px 0 #9ca3af';
+            }
+        });
+        const fb = document.getElementById('feedback');
+        fb.className = 'feedback-msg wrong show';
+        fb.textContent = `⏰ Time's up! The answer was ${currentAnswer}`;
+        sfxTimeout();
+        updateStats();
+        advanceTimedQuestion();
+    }
+
+    function advanceTimedQuestion() {
+        timedQCount++;
+        if (timedQCount >= TOTAL_TIMED_Q) {
+            setTimeout(showGameOver, 1500);
+        } else {
+            setTimeout(() => loadQuestion(), 1700);
+        }
+    }
+
+    function updateQCounter() {
+        const qNum = Math.min(timedQCount + 1, TOTAL_TIMED_Q);
+        document.getElementById('q-counter').textContent =
+            `Question ${qNum} of ${TOTAL_TIMED_Q}  •  ${difficulty.charAt(0).toUpperCase()+difficulty.slice(1)} (${getTimeLimit()}s each)`;
+    }
+
+    function showGameOver() {
+        stopTimer();
+        const acc = totalQ > 0 ? Math.round((correctQ / totalQ) * 100) : 0;
+        document.getElementById('go-score').textContent   = score;
+        document.getElementById('go-correct').textContent = `${correctQ}/${TOTAL_TIMED_Q}`;
+        document.getElementById('go-acc').textContent     = acc + '%';
+        document.getElementById('go-best').textContent    = bestStreak;
+
+        let emoji, title, sub;
+        if (acc >= 80)      { emoji = '🏆'; title = 'Outstanding!';  sub = 'You\'re a Math Superstar! 🌟'; launchConfetti(); sfxSummaryWin(); }
+        else if (acc >= 60) { emoji = '⭐'; title = 'Great Job!';    sub = 'Keep practising — you\'re getting there! 💪'; sfxSummaryGood(); }
+        else                { emoji = '💪'; title = 'Good Try!';     sub = 'Practice makes perfect! 🌈'; sfxSummaryTryAgain(); }
+
+        document.getElementById('go-emoji').textContent = emoji;
+        document.getElementById('go-title').textContent = title;
+        document.getElementById('go-sub').textContent   = sub;
+        document.getElementById('game-over-overlay').classList.add('show');
+    }
+
+    function restartTimedGame() {
+        document.getElementById('game-over-overlay').classList.remove('show');
+        score = 0; streak = 0; totalQ = 0; correctQ = 0;
+        resetTimedState();
+        updateStats();
+        loadQuestion();
+    }
+
+    /* ── settings controls ─────────────────────────────────────── */
+    function toggleSettings() {
+        const drawer   = document.getElementById('settings-drawer');
+        const backdrop = document.getElementById('settings-backdrop');
+        const fab      = document.getElementById('settings-fab');
+        const open = drawer.classList.toggle('open');
+        backdrop.classList.toggle('show', open);
+        fab.style.display = open ? 'none' : '';
+    }
+
+    function setCfgDigits(n) {
+        maxDigits = n;
+        [1, 2, 3, 4].forEach(v =>
+            document.getElementById(`cfg-digits-${v}`).classList.toggle('active', v === n));
+        stopTimer();
+        loadQuestion();
+    }
+
+    function setCfgFactors(n) {
+        maxFactors = n;
+        [2, 3, 4].forEach(v =>
+            document.getElementById(`cfg-factors-${v}`).classList.toggle('active', v === n));
+        stopTimer();
+        loadQuestion();
+    }
+
+    function toggleCfgOp(op) {
+        if (op === 'mul') inclMul = !inclMul;
+        else              inclDiv = !inclDiv;
+        document.getElementById(`cfg-${op}`).classList.toggle(
+            'active', op === 'mul' ? inclMul : inclDiv);
+        loadQuestion();
+    }
+
+    function updateCfgOpsNote() { /* no-op: mul/div now apply to all modes */ }
+
+    /* ── confetti ─────────────────────────────────────────────── */
+    function launchConfetti() {
+        const container = document.getElementById('confetti');
+        const colors = ['#ff6b6b','#feca57','#48dbfb','#ff9ff3','#4ade80','#a78bfa','#f97316'];
+
+        for (let i = 0; i < 90; i++) {
+            const p = document.createElement('div');
+            p.className = 'confetti-piece';
+            const size = randInt(6, 16);
+            p.style.cssText = `
+                left: ${Math.random() * 100}%;
+                width: ${size}px; height: ${size}px;
+                background: ${pick(colors)};
+                border-radius: ${Math.random() > 0.5 ? '50%' : '3px'};
+                animation-duration: ${(1.2 + Math.random() * 2).toFixed(2)}s;
+                animation-delay: ${(Math.random() * 0.6).toFixed(2)}s;
+                transform: rotate(${randInt(0,360)}deg);
+            `;
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 3200);
+        }
+    }
+
+    /* ── background stars ─────────────────────────────────────── */
+    function createStars() {
+        const c = document.getElementById('stars');
+        for (let i = 0; i < 60; i++) {
+            const s = document.createElement('div');
+            s.className = 'star';
+            const sz = (1.5 + Math.random() * 3.5).toFixed(1);
+            s.style.cssText = `
+                left: ${Math.random()*100}%; top: ${Math.random()*100}%;
+                width: ${sz}px; height: ${sz}px;
+                animation-delay: ${(Math.random()*2).toFixed(2)}s;
+                animation-duration: ${(1+Math.random()*2).toFixed(2)}s;
+            `;
+            c.appendChild(s);
+        }
+    }
+
+    /* ── init ─────────────────────────────────────────────────── */
+    createStars();
+    document.getElementById('timer-section').classList.add('visible');
+    loadQuestion();
+</script>
+</body>
+</html>
