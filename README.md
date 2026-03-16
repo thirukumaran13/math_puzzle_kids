@@ -47,7 +47,7 @@ math-puzzle-kids.html   ← everything in one file
 
 ## Screenshots
 
-> Default view opens in **Timed Mode / Medium difficulty**.
+![Math Puzzle Fun - Screenshot](math-puzzle-kids.jpg)
 
 ---
 
